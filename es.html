@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Our Savings 💖</title>
+  <style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #fdf6f0;
+}
+
+h1 { color: #ff5e78; }
+
+.box {
+  background: white;
+  padding: 15px;
+  margin: 10px auto;
+  width: 340px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #ccc;
+}
+
+img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+input, button {
+  padding: 8px;
+  margin: 5px;
+}
+
+button {
+  background: #ff5e78;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.log-card {
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 10px;
+  text-align: left;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+.log-name {
+  font-weight: bold;
+  color: #ff5e78;
+}
+
+.log-amount {
+  font-size: 16px;
+}
+
+.log-date {
+  font-size: 12px;
+  color: gray;
+}
+
+.selected {
+  border: 2px solid #ff5e78;
+  background: #ffe3ea;
+}
+</style>
+</head>
+<body>
+
+<h1>💖 Our Savings 💖</h1>
+
+<div class="box">
+  <input type="number" id="amount" value="20">
+</div>
+
+<div class="box">
+
+  <img src="melvy.jpg">
+  <h3 id="person1">Melvy: ₱0</h3>
+  <button onclick="addMoney(1)">Add</button>
+
+  <br><br>
+
+  <img src="andrea.jpg">
+  <h3 id="person2">Andrea: ₱0</h3>
+  <button onclick="addMoney(2)">Add</button>
+
+</div>
+
+<div class="box">
+  <h2>Total: ₱<span id="total">0</span></h2>
+</div>
+
+<div class="box">
+  <h3>Logs</h3>
+  <ul id="logs"></ul>
+  <button id="deleteBtn" onclick="deleteSelected()">❌ Delete Selected</button>
+</div>
+
+<script>
+let data = {
+  money1: 0,
+  money2: 0,
+  logs: []
+};
+
+const name1 = "Melvy";
+const name2 = "Andrea";
+
+let selectedIndex = -1;
+
+function addMoney(person) {
+  let amount = parseInt(document.getElementById("amount").value);
+  if (!amount) return;
+
+  let date = new Date().toLocaleDateString();
+
+  let log = {
+    person: person,
+    amount: amount,
+    text: (person === 1 ? name1 : name2) +
+          " saved ₱" + amount + " on " + date
+  };
+
+  if (person === 1) data.money1 += amount;
+  else data.money2 += amount;
+
+  data.logs.push(log);
+  update();
+}
+
+function deleteSelected() {
+  if (selectedIndex === -1) return;
+
+  let log = data.logs[selectedIndex];
+
+  if (log.person === 1) data.money1 -= log.amount;
+  else data.money2 -= log.amount;
+
+  data.logs.splice(selectedIndex, 1);
+  selectedIndex = -1;
+  update();
+}
+
+function update() {
+  document.getElementById("person1").innerText =
+    name1 + ": ₱" + data.money1;
+
+  document.getElementById("person2").innerText =
+    name2 + ": ₱" + data.money2;
+
+  document.getElementById("total").innerText =
+    data.money1 + data.money2;
+
+  let list = document.getElementById("logs");
+  list.innerHTML = "";
+
+  for (let i = data.logs.length - 1; i >= 0; i--) {
+    let log = data.logs[i];
+
+    let div = document.createElement("div");
+    div.className = "log-card";
+
+    if (i === selectedIndex) {
+      div.classList.add("selected");
+    }
+
+    div.innerHTML = `
+      <div class="log-name">${log.person === 1 ? name1 : name2}</div>
+      <div class="log-amount">₱${log.amount}</div>
+      <div class="log-date">${log.text.split(" on ")[1] || ""}</div>
+    `;
+
+    div.onclick = () => {
+      selectedIndex = i;
+      update();
+    };
+
+    list.appendChild(div);
+  }
+
+  document.getElementById("deleteBtn").style.display =
+    data.logs.length ? "inline-block" : "none";
+}
+
+update();
+</script>
+
+</body>
+</html>
